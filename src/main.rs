@@ -1,15 +1,26 @@
-use std::io::{Read, Write};
-use std::fs::File;
+use clap::Parser;
 use reqwest::blocking::Client;
+use std::fs::File;
+use std::io::{Read, Write};
+use std::error::Error;
 
-fn main() {
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    url: String,
+
+    #[arg(short, long)]
+    output: String,
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let args = Args::parse();
     let client = Client::new();
 
-    let url = "https://azul-1.nty.uy/";
+    let mut response = client.get(args.url).send()?;
 
-    let mut response = client.get(url).send().unwrap();
-
-    let mut file = File::create("radio.mp3").unwrap();
+    let mut file = File::create(args.output)?;
 
     let mut buffer = [0; 1024];
 
@@ -18,6 +29,8 @@ fn main() {
             break;
         }
 
-        file.write_all(&buffer[..len]).unwrap();
+        file.write_all(&buffer[..len])?;
     }
+
+    Ok(())
 }
