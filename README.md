@@ -1,0 +1,1 @@
+Quite simple example of how to download a stream to a file using Rust and a couple of libraries.
